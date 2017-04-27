@@ -189,6 +189,19 @@
                 <version>${hazelcast.version}</version>
             </dependency>
 
+            <!-- Solr event table dependencies -->
+
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-core</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+
             <!--Time-->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -532,6 +545,7 @@
         <jackson-datatype-joda-version>2.4.1</jackson-datatype-joda-version>
         <netty-version>4.1.0.Final</netty-version>
         <commons-collection-version>4.0</commons-collection-version>
+        <solr.version>6.2.1</solr.version>
     </properties>
 
     <scm>
