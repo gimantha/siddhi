@@ -59,6 +59,11 @@ public class SolrSchema implements Serializable {
         fields.put(name, field);
     }
 
+    public void addField(SolrSchemaField solrSchemaField) {
+        SolrSchemaField field = new SolrSchemaField(solrSchemaField);
+        fields.put(field.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), field);
+    }
+
     public SolrSchemaField getField(String fieldName) {
         if (fields.get(fieldName) != null) {
             return new SolrSchemaField(fields.get(fieldName));

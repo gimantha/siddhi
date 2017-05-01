@@ -21,6 +21,7 @@ package org.wso2.siddhi.extensions.recordtable.solr;
 import org.wso2.siddhi.core.exception.ExecutionPlanCreationException;
 import org.wso2.siddhi.core.table.record.AbstractRecordTable;
 import org.wso2.siddhi.core.table.record.ConditionBuilder;
+import org.wso2.siddhi.core.table.record.RecordIterator;
 import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.core.util.collection.operator.CompiledCondition;
 import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchema;
@@ -97,7 +98,8 @@ public class SolrEventTable extends AbstractRecordTable {
     }
 
     @Override
-    protected List<Object[]> find(Map<String, Object> findConditionParameterMap, CompiledCondition compiledCondition) {
+    protected RecordIterator<Object[]> find(Map<String, Object> findConditionParameterMap, CompiledCondition
+            compiledCondition) {
         return null;
     }
 

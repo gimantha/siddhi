@@ -51,9 +51,19 @@ public class SolrSchemaField implements Serializable {
         return new HashMap<>(properties);
     }
 
+    public Object getProperty(String name) {
+        return this.properties.get(name);
+    }
+
     public void setProperties(Map<String, Object> otherProperties) {
         if (otherProperties != null) {
             this.properties.putAll(otherProperties);
+        }
+    }
+
+    public void setProperty(String name, Object value) {
+        if(name != null && !name.trim().isEmpty()) {
+            this.properties.put(name, value);
         }
     }
 
