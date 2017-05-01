@@ -45,7 +45,7 @@ public interface SolrClientService {
      * @return {@link org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchema}
      * @throws org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrClientServiceException Exception thrown if something goes wrong while retrieving the indexSchema
      */
-    public SolrSchema getIndexSchema(String table)
+    public SolrSchema getSolrSchema(String table)
             throws SolrClientServiceException, SolrSchemaNotFoundException;
 
     /**
@@ -54,7 +54,7 @@ public interface SolrClientService {
      * @return return true if successful, otherwise false
      * @throws org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrClientServiceException Exception thrown if something goes wrong while deleting the index.
      */
-    public boolean deleteIndexForTable(String table) throws SolrClientServiceException;
+    public boolean deleteCollection(String table) throws SolrClientServiceException;
 
     /**
      * Checks if the index for a specific table exists or not.
@@ -63,7 +63,7 @@ public interface SolrClientService {
      * @return True if there is an index for the given table, otherwise false
      * @throws org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrClientServiceException Exception is thrown if something goes wrong.
      */
-    public boolean indexExists(String table) throws SolrClientServiceException;
+    public boolean collectionExists(String table) throws SolrClientServiceException;
 
     /**
      * Checks if the index configuration exists or not.
@@ -72,7 +72,7 @@ public interface SolrClientService {
      * @return True of the configurations exists otherwise false
      * @throws org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrClientServiceException Exceptions is thrown if something goes wrong.
      */
-    public boolean indexConfigsExists(String table) throws SolrClientServiceException;
+    public boolean collectionConfigExists(String table) throws SolrClientServiceException;
 
     /**
      * Inserts records as Solr documents to Solr index.
@@ -80,7 +80,7 @@ public interface SolrClientService {
      * @param docs Documents which represents the records
      * @throws org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrClientServiceException Exceptions is thrown if something goes wrong.
      */
-    public void indexDocuments(String table, List<SolrIndexDocument> docs) throws SolrClientServiceException;
+    public void insertDocuments(String table, List<SolrIndexDocument> docs) throws SolrClientServiceException;
 
     /**
      * Delete index documents by given document/record ids

@@ -23,7 +23,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -48,12 +48,12 @@ import java.util.ServiceLoader;
  * This class contains the unit tests for indexer service;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class CarbonIndexerServiceTest {
+public class CarbonIndexerServiceTestCase {
 
     private SolrClientService indexerService;
 
 
-    @BeforeClass
+    @Before
     public void init() throws SolrClientServiceException {
         System.setProperty(IndexerUtils.WSO2_ANALYTICS_INDEX_CONF_DIRECTORY_SYS_PROP, "src/test/resources/conf");
         ServiceLoader<SolrClientService> analyticsIndexServiceServiceLoader = ServiceLoader.load(SolrClientService.class);
@@ -68,25 +68,25 @@ public class CarbonIndexerServiceTest {
     public void step1_testCreateIndexForTable() throws SolrClientServiceException {
         CollectionConfiguration config = new CollectionConfiguration.Builder().collectionName("T1").build();
         indexerService.createCollection(config);
-        Assert.assertTrue(indexerService.indexExists("T1"));
+        Assert.assertTrue(indexerService.collectionExists("T1"));
     }
 
     @Test
     public void step2_testCreateExistingIndex() throws SolrClientServiceException {
         CollectionConfiguration config = new CollectionConfiguration.Builder().collectionName("T1").build();
-        Assert.assertTrue(indexerService.indexExists("T1"));
+        Assert.assertTrue(indexerService.collectionExists("T1"));
         Assert.assertFalse(indexerService.createCollection(config));
     }
 
     @Test
     public void step3_testIfInitialConfigsAreCopied() throws SolrClientServiceException {
-        Assert.assertTrue(indexerService.indexConfigsExists("T1"));
+        Assert.assertTrue(indexerService.collectionConfigExists("T1"));
     }
 
     @Test
     public void step4_testNonExistingIndexSchema() throws SolrClientServiceException {
         try {
-            indexerService.getIndexSchema("T2");
+            indexerService.getSolrSchema("T2");
         } catch (Exception e) {
             Assert.assertTrue(e instanceof SolrSchemaNotFoundException);
         }
@@ -94,7 +94,7 @@ public class CarbonIndexerServiceTest {
 
     @Test
     public void step5_testInitialIndexSchema() throws SolrClientServiceException, SolrSchemaNotFoundException {
-        SolrSchema indexSchema = indexerService.getIndexSchema("T1");
+        SolrSchema indexSchema = indexerService.getSolrSchema("T1");
         Assert.assertEquals(indexSchema.getUniqueKey(), "id");
     }
 
@@ -118,20 +118,20 @@ public class CarbonIndexerServiceTest {
         floatField.setProperty("type", "float");
         floatField.setProperty("stored", true);
         SolrSchemaField doubleField = new SolrSchemaField();
-        floatField.setProperty("name", "DoubleField");
-        floatField.setProperty("indexed", true);
-        floatField.setProperty("type", "double");
+        doubleField.setProperty("name", "DoubleField");
+        doubleField.setProperty("indexed", true);
+        doubleField.setProperty("type", "double");
         floatField.setProperty("stored", true);
         SolrSchemaField boolField = new SolrSchemaField();
-        floatField.setProperty("name", "BoolField");
-        floatField.setProperty("indexed", true);
-        floatField.setProperty("type", "boolean");
-        floatField.setProperty("stored", true);
+        boolField.setProperty("name", "BoolField");
+        boolField.setProperty("indexed", true);
+        boolField.setProperty("type", "boolean");
+        boolField.setProperty("stored", true);
         SolrSchemaField timestamp = new SolrSchemaField();
-        floatField.setProperty("name", "_timestamp");
-        floatField.setProperty("indexed", true);
-        floatField.setProperty("type", "long");
-        floatField.setProperty("stored", true);
+        timestamp.setProperty("name", "_timestamp");
+        timestamp.setProperty("indexed", true);
+        timestamp.setProperty("type", "long");
+        timestamp.setProperty("stored", true);
         fieldMap.put(intField.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), intField);
         fieldMap.put(longField.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), longField);
         fieldMap.put(doubleField.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), doubleField);
@@ -140,7 +140,7 @@ public class CarbonIndexerServiceTest {
         fieldMap.put(timestamp.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), timestamp);
         SolrSchema indexSchema = new SolrSchema("id", fieldMap);
         Assert.assertTrue(indexerService.updateSolrSchema("T1", indexSchema, false));
-        SolrSchema indexSchema1 = indexerService.getIndexSchema("T1");
+        SolrSchema indexSchema1 = indexerService.getSolrSchema("T1");
         Assert.assertEquals(indexSchema1.getField("IntField"), indexSchema.getField("IntField"));
         Assert.assertEquals(indexSchema1.getField("LongField"), indexSchema.getField("LongField"));
         Assert.assertEquals(indexSchema1.getField("DoubleField"), indexSchema.getField("DoubleField"));
@@ -152,47 +152,41 @@ public class CarbonIndexerServiceTest {
     @Test
     public void step7_testUpdateIndexSchemaWithMerge()
             throws SolrSchemaNotFoundException, SolrClientServiceException {
-        SolrSchema oldIndexSchema = indexerService.getIndexSchema("T1");
+        SolrSchema oldIndexSchema = indexerService.getSolrSchema("T1");
         Map<String, SolrSchemaField> fieldMap = new HashMap<>();
         SolrSchemaField intField = new SolrSchemaField();
-        intField.setProperty("name", "IntField");
+        intField.setProperty("name", "IntField1");
         intField.setProperty("indexed", true);
         intField.setProperty("type", "int");
         intField.setProperty("stored", true);
         SolrSchemaField longField = new SolrSchemaField();
-        longField.setProperty("name", "LongField");
+        longField.setProperty("name", "LongField1");
         longField.setProperty("indexed", true);
         longField.setProperty("type", "long");
         longField.setProperty("stored", true);
         SolrSchemaField floatField = new SolrSchemaField();
-        floatField.setProperty("name", "FloatField");
+        floatField.setProperty("name", "FloatField1");
         floatField.setProperty("indexed", true);
         floatField.setProperty("type", "float");
         floatField.setProperty("stored", true);
         SolrSchemaField doubleField = new SolrSchemaField();
-        floatField.setProperty("name", "DoubleField");
-        floatField.setProperty("indexed", true);
-        floatField.setProperty("type", "double");
-        floatField.setProperty("stored", true);
+        doubleField.setProperty("name", "DoubleField1");
+        doubleField.setProperty("indexed", true);
+        doubleField.setProperty("type", "double");
+        doubleField.setProperty("stored", true);
         SolrSchemaField boolField = new SolrSchemaField();
-        floatField.setProperty("name", "BoolField");
-        floatField.setProperty("indexed", true);
-        floatField.setProperty("type", "boolean");
-        floatField.setProperty("stored", true);
-        SolrSchemaField timestamp = new SolrSchemaField();
-        floatField.setProperty("name", "_timestamp");
-        floatField.setProperty("indexed", true);
-        floatField.setProperty("type", "long");
-        floatField.setProperty("stored", true);
+        boolField.setProperty("name", "BoolField1");
+        boolField.setProperty("indexed", true);
+        boolField.setProperty("type", "boolean");
+        boolField.setProperty("stored", true);
         fieldMap.put(intField.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), intField);
         fieldMap.put(longField.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), longField);
         fieldMap.put(doubleField.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), doubleField);
         fieldMap.put(floatField.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), floatField);
         fieldMap.put(boolField.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), boolField);
-        fieldMap.put(timestamp.getProperty(SolrSchemaField.ATTR_FIELD_NAME).toString(), timestamp);
         SolrSchema indexSchema = new SolrSchema("id", fieldMap);
         Assert.assertTrue(indexerService.updateSolrSchema("T1", indexSchema, true));
-        SolrSchema newIndexSchema = indexerService.getIndexSchema("T1");
+        SolrSchema newIndexSchema = indexerService.getSolrSchema("T1");
         Assert.assertEquals(newIndexSchema.getField("IntField1"), indexSchema.getField("IntField1"));
         Assert.assertEquals(newIndexSchema.getField("LongField1"), indexSchema.getField("LongField1"));
         Assert.assertEquals(newIndexSchema.getField("DoubleField1"), indexSchema.getField("DoubleField1"));
@@ -227,7 +221,7 @@ public class CarbonIndexerServiceTest {
         List<SolrIndexDocument> docs = new ArrayList<>();
         docs.add(doc1);
         docs.add(doc2);
-        indexerService.indexDocuments("T1", docs);
+        indexerService.insertDocuments("T1", docs);
 
         SiddhiSolrClient client = indexerService.getSolrServiceClient();
         SolrQuery query = new SolrQuery();
@@ -261,7 +255,7 @@ public class CarbonIndexerServiceTest {
     }
 
     @Test
-    public void step10_testDeleteDocumentsByIds() throws SolrClientServiceException, IOException,
+    public void stepA_testDeleteDocumentsByIds() throws SolrClientServiceException, IOException,
                                                   SolrServerException {
         List<String> ids = new ArrayList<>();
         ids.add("2");
@@ -275,17 +269,17 @@ public class CarbonIndexerServiceTest {
     }
 
     @Test
-    public void step11_testDeleteIndexForTable() throws SolrClientServiceException {
-        Assert.assertTrue(indexerService.deleteIndexForTable("T1"));
+    public void stepB_testDeleteIndexForTable() throws SolrClientServiceException {
+        Assert.assertTrue(indexerService.deleteCollection("T1"));
     }
 
     @Test
-    public void step12_testDeleteNonExistingIndex() throws SolrClientServiceException {
-        Assert.assertFalse(indexerService.deleteIndexForTable("T1"));
+    public void stepC_testDeleteNonExistingIndex() throws SolrClientServiceException {
+        Assert.assertFalse(indexerService.deleteCollection("T1"));
     }
 
     @Test
-    public void step13_testDestroy() throws SolrClientServiceException {
+    public void stepD_testDestroy() throws SolrClientServiceException {
         indexerService.destroy();
     }
 }

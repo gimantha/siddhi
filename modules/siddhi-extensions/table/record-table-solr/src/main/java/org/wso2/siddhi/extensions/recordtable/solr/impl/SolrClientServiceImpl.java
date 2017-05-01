@@ -105,9 +105,9 @@ public class SolrClientServiceImpl implements SolrClientService {
         }
         String tableNameWithTenant = IndexerUtils.getCollectionNameWithDomainName(table);
         try {
-            if (!indexExists(table)) {
-                if (!indexConfigsExists(configSet)) {
-                    ConfigSetAdminResponse configSetResponse = createInitialIndexConfiguration(config);
+            if (!collectionExists(table)) {
+                if (!collectionConfigExists(configSet)) {
+                    ConfigSetAdminResponse configSetResponse = createInitialSolrCollectionConfig(config);
                     Object errors = configSetResponse.getErrorMessages();
                     if (configSetResponse.getStatus() == 0 && errors == null) {
                         return createSolrCollection(table, tableNameWithTenant);
@@ -130,7 +130,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     This method is to create the initial index configurations for the index of a table. This will include a default
     indexSchema and other Solr configurations. Later by using updateSolrSchema we can edit the index schema
     */
-    private ConfigSetAdminResponse createInitialIndexConfiguration(CollectionConfiguration config)
+    private ConfigSetAdminResponse createInitialSolrCollectionConfig(CollectionConfiguration config)
             throws SolrServerException, IOException,
                    SolrClientServiceException {
         String tableNameWithTenant = IndexerUtils.getCollectionNameWithDomainName(config.getCollectionName());
@@ -168,7 +168,7 @@ public class SolrClientServiceImpl implements SolrClientService {
         String tableNameWithTenantDomain = IndexerUtils.getCollectionNameWithDomainName(table);
         SchemaResponse.UpdateResponse updateResponse;
         try {
-            oldSchema = getIndexSchema(table);
+            oldSchema = getSolrSchema(table);
         } catch (SolrSchemaNotFoundException e) {
             throw new SolrClientServiceException("Error while retrieving  the Solr schema for table: " + table, e);
         }
@@ -253,21 +253,21 @@ public class SolrClientServiceImpl implements SolrClientService {
     }
 
     @Override
-    public SolrSchema getIndexSchema(String table)
+    public SolrSchema getSolrSchema(String table)
             throws SolrClientServiceException, SolrSchemaNotFoundException {
         SolrClient client = getSolrServiceClient();
         String tableNameWithTenantDomain = IndexerUtils.getCollectionNameWithDomainName(table);
         SolrSchema solrSchema = solrSchemaCache.get(tableNameWithTenantDomain);
         if (solrSchema == null) {
             try {
-                if (indexConfigsExists(table)) {
+                if (collectionConfigExists(table)) {
                     SchemaRequest.Fields fieldsRequest = new SchemaRequest.Fields();
                     SchemaRequest.UniqueKey uniqueKeyRequest = new SchemaRequest.UniqueKey();
                     SchemaResponse.FieldsResponse fieldsResponse = fieldsRequest.process(client, table);
                     SchemaResponse.UniqueKeyResponse uniqueKeyResponse = uniqueKeyRequest.process(client, table);
                     List<Map<String, Object>> fields = fieldsResponse.getFields();
                     String uniqueKey = uniqueKeyResponse.getUniqueKey();
-                    solrSchema = createIndexSchemaFromSolrSchema(uniqueKey, fields);
+                    solrSchema = createSolrSchema(uniqueKey, fields);
                     solrSchemaCache.put(tableNameWithTenantDomain, solrSchema);
                 } else {
                     throw new SolrSchemaNotFoundException("Index schema for table: " + table + "is not found");
@@ -280,7 +280,7 @@ public class SolrClientServiceImpl implements SolrClientService {
         return solrSchema;
     }
 
-    private static SolrSchema createIndexSchemaFromSolrSchema(String uniqueKey, List<Map<String, Object>> fields) throws
+    private static SolrSchema createSolrSchema(String uniqueKey, List<Map<String, Object>> fields) throws
                                                                                                                   SolrClientServiceException {
         SolrSchema solrSchema = new SolrSchema();
         solrSchema.setUniqueKey(uniqueKey);
@@ -304,14 +304,14 @@ public class SolrClientServiceImpl implements SolrClientService {
     }
 
     @Override
-    public boolean deleteIndexForTable(String table) throws SolrClientServiceException {
+    public boolean deleteCollection(String table) throws SolrClientServiceException {
         try {
-            if (indexExists(table)) {
+            if (collectionExists(table)) {
                 String tableNameWithTenant = IndexerUtils.getCollectionNameWithDomainName(table);
                 CollectionAdminRequest.Delete deleteRequest = CollectionAdminRequest.deleteCollection(tableNameWithTenant);
                 CollectionAdminResponse deleteRequestResponse =
                         deleteRequest.process(getSolrServiceClient(), tableNameWithTenant);
-                if (deleteRequestResponse.isSuccess() && indexConfigsExists(table)) {
+                if (deleteRequestResponse.isSuccess() && collectionConfigExists(table)) {
                     ConfigSetAdminRequest.Delete configSetAdminRequest = new ConfigSetAdminRequest.Delete();
                     configSetAdminRequest.setConfigSetName(tableNameWithTenant);
                     ConfigSetAdminResponse configSetResponse = configSetAdminRequest.process(getSolrServiceClient());
@@ -333,7 +333,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     }
 
     @Override
-    public boolean indexExists(String table) throws SolrClientServiceException {
+    public boolean collectionExists(String table) throws SolrClientServiceException {
         CollectionAdminRequest.List listRequest = CollectionAdminRequest.listCollections();
         String tableWithTenant = IndexerUtils.getCollectionNameWithDomainName(table);
         try {
@@ -353,7 +353,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     }
 
     @Override
-    public boolean indexConfigsExists(String table) throws SolrClientServiceException {
+    public boolean collectionConfigExists(String table) throws SolrClientServiceException {
         ConfigSetAdminResponse.List listRequestReponse;
         SiddhiSolrClient siddhiSolrClient = getSolrServiceClient();
         String tableNameWithTenantDomain = IndexerUtils.getCollectionNameWithDomainName(table);
@@ -374,7 +374,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     }
 
     @Override
-    public void indexDocuments(String table, List<SolrIndexDocument> docs) throws SolrClientServiceException {
+    public void insertDocuments(String table, List<SolrIndexDocument> docs) throws SolrClientServiceException {
         try {
             SiddhiSolrClient client = getSolrServiceClient();
             client.add(table, IndexerUtils.getSolrInputDocuments(docs));

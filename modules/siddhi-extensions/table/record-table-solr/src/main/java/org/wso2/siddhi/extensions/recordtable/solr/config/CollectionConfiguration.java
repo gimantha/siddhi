@@ -2,17 +2,28 @@ package org.wso2.siddhi.extensions.recordtable.solr.config;
 
 import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchema;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Represents the Indexing Server details to connect.
  */
-
+@XmlRootElement(name = "indexer-config")
 public class CollectionConfiguration {
+    private final static String DEFAULT_SOLR_URL = "localhost:9983";
+    private final static String BASE_CONFIG_SET = "gettingstarted";
+    private final static String DEFAULT_NO_OF_SHARDS = "2";
+    private final static String DEFAULT_NO_OF_REPLICA = "1";
     private String solrServerUrl;
     private String collectionName;
     private int noOfShards;
     private int noOfReplicas;
     private String configSet;
     private SolrSchema schema;
+
+    private CollectionConfiguration() {
+
+    }
 
     private CollectionConfiguration(String collectionName, String solrServerUrl, int noOfShards, int noOfReplicas,
                                    SolrSchema schema, String configSet) {
@@ -24,6 +35,7 @@ public class CollectionConfiguration {
         this.schema = schema;
     }
 
+    @XmlElement(name = "solr-cloud-url", defaultValue = DEFAULT_SOLR_URL )
     public String getSolrServerUrl() {
         return solrServerUrl;
     }
@@ -32,6 +44,7 @@ public class CollectionConfiguration {
         this.solrServerUrl = solrServerUrl;
     }
 
+    @XmlElement(name = "no-of-shards", defaultValue = DEFAULT_NO_OF_SHARDS)
     public int getNoOfShards() {
         return noOfShards;
     }
@@ -40,6 +53,7 @@ public class CollectionConfiguration {
         this.noOfShards = noOfShards;
     }
 
+    @XmlElement(name = "no-of-replica", defaultValue = DEFAULT_NO_OF_REPLICA)
     public int getNoOfReplicas() {
         return noOfReplicas;
     }
@@ -48,6 +62,7 @@ public class CollectionConfiguration {
         this.noOfReplicas = noOfReplicas;
     }
 
+    @XmlElement(name = "default-config-set", defaultValue = BASE_CONFIG_SET)
     public String getConfigSet() {
         return configSet;
     }
