@@ -1,4 +1,4 @@
-package org.wso2.siddhi.extensions.recordtable.solr.impl;
+package org.wso2.siddhi.extensions.table.solr.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,14 +12,14 @@ import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.common.SolrException;
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrIndexDocument;
-import org.wso2.siddhi.extensions.recordtable.solr.config.CollectionConfiguration;
-import org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrClientServiceException;
-import org.wso2.siddhi.extensions.recordtable.solr.utils.IndexerUtils;
-import org.wso2.siddhi.extensions.recordtable.solr.SolrClientService;
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchema;
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchemaField;
-import org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrSchemaNotFoundException;
+import org.wso2.siddhi.extensions.table.solr.SolrClientService;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrIndexDocument;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrSchema;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrSchemaField;
+import org.wso2.siddhi.extensions.table.solr.config.CollectionConfiguration;
+import org.wso2.siddhi.extensions.table.solr.exceptions.SolrClientServiceException;
+import org.wso2.siddhi.extensions.table.solr.exceptions.SolrSchemaNotFoundException;
+import org.wso2.siddhi.extensions.table.solr.utils.SolrTableUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 /**
- * This class represents a concrete implementation of {@link org.wso2.siddhi.extensions.recordtable.solr.SolrClientService}
+ * This class represents a concrete implementation of {@link org.wso2.siddhi.extensions.table.solr.SolrClientService}
  */
 public class SolrClientServiceImpl implements SolrClientService {
 
@@ -59,12 +59,12 @@ public class SolrClientServiceImpl implements SolrClientService {
     }
 
     private CollectionConfiguration loadGlobalCollectionConfigurations() throws SolrClientServiceException {
-        File confFile = new File(IndexerUtils.getIndexerConfDirectory() + File.separator +
+        File confFile = new File(SolrTableUtils.getIndexerConfDirectory() + File.separator +
                                  INDEXER_CONFIG_DIR + File.separator +
                                  INDEXER_CONFIG_FILE);
         try {
             if (!confFile.exists()) {
-                confFile = IndexerUtils.getFileFromSystemResources(INDEXER_CONFIG_FILE);
+                confFile = SolrTableUtils.getFileFromSystemResources(INDEXER_CONFIG_FILE);
                 throw new SolrClientServiceException("the indexer service configuration file cannot be found at: " +
                                            confFile.getPath());
             }
@@ -103,7 +103,7 @@ public class SolrClientServiceImpl implements SolrClientService {
         if (configSet == null || configSet.trim().isEmpty()) {
             configSet = table;
         }
-        String tableNameWithTenant = IndexerUtils.getCollectionNameWithDomainName(table);
+        String tableNameWithTenant = SolrTableUtils.getCollectionNameWithDomainName(table);
         try {
             if (!collectionExists(table)) {
                 if (!collectionConfigExists(configSet)) {
@@ -133,7 +133,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     private ConfigSetAdminResponse createInitialSolrCollectionConfig(CollectionConfiguration config)
             throws SolrServerException, IOException,
                    SolrClientServiceException {
-        String tableNameWithTenant = IndexerUtils.getCollectionNameWithDomainName(config.getCollectionName());
+        String tableNameWithTenant = SolrTableUtils.getCollectionNameWithDomainName(config.getCollectionName());
         ConfigSetAdminRequest.Create configSetAdminRequest = new ConfigSetAdminRequest.Create();
         if (config.getConfigSet() != null && !config.getConfigSet().trim().isEmpty()) {
             configSetAdminRequest.setBaseConfigSetName(config.getConfigSet());
@@ -165,7 +165,7 @@ public class SolrClientServiceImpl implements SolrClientService {
         SolrSchema oldSchema;
         List<SchemaRequest.Update> updateFields = new ArrayList<>();
         SolrClient client = getSolrServiceClient();
-        String tableNameWithTenantDomain = IndexerUtils.getCollectionNameWithDomainName(table);
+        String tableNameWithTenantDomain = SolrTableUtils.getCollectionNameWithDomainName(table);
         SchemaResponse.UpdateResponse updateResponse;
         try {
             oldSchema = getSolrSchema(table);
@@ -180,7 +180,7 @@ public class SolrClientServiceImpl implements SolrClientService {
             Object errors = updateResponse.getResponse().get(ATTR_ERRORS);
             if (updateResponse.getStatus() == 0 && errors == null) {
                 if (merge) {
-                    SolrSchema mergedSchema = IndexerUtils.getMergedIndexSchema(oldSchema, solrSchema);
+                    SolrSchema mergedSchema = SolrTableUtils.getMergedIndexSchema(oldSchema, solrSchema);
                     solrSchemaCache.put(tableNameWithTenantDomain, mergedSchema);
                 } else {
                     solrSchemaCache.put(tableNameWithTenantDomain, solrSchema);
@@ -256,7 +256,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     public SolrSchema getSolrSchema(String table)
             throws SolrClientServiceException, SolrSchemaNotFoundException {
         SolrClient client = getSolrServiceClient();
-        String tableNameWithTenantDomain = IndexerUtils.getCollectionNameWithDomainName(table);
+        String tableNameWithTenantDomain = SolrTableUtils.getCollectionNameWithDomainName(table);
         SolrSchema solrSchema = solrSchemaCache.get(tableNameWithTenantDomain);
         if (solrSchema == null) {
             try {
@@ -307,7 +307,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     public boolean deleteCollection(String table) throws SolrClientServiceException {
         try {
             if (collectionExists(table)) {
-                String tableNameWithTenant = IndexerUtils.getCollectionNameWithDomainName(table);
+                String tableNameWithTenant = SolrTableUtils.getCollectionNameWithDomainName(table);
                 CollectionAdminRequest.Delete deleteRequest = CollectionAdminRequest.deleteCollection(tableNameWithTenant);
                 CollectionAdminResponse deleteRequestResponse =
                         deleteRequest.process(getSolrServiceClient(), tableNameWithTenant);
@@ -335,7 +335,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     @Override
     public boolean collectionExists(String table) throws SolrClientServiceException {
         CollectionAdminRequest.List listRequest = CollectionAdminRequest.listCollections();
-        String tableWithTenant = IndexerUtils.getCollectionNameWithDomainName(table);
+        String tableWithTenant = SolrTableUtils.getCollectionNameWithDomainName(table);
         try {
             CollectionAdminResponse listResponse = listRequest.process(getSolrServiceClient());
             Object errors = listResponse.getErrorMessages();
@@ -356,7 +356,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     public boolean collectionConfigExists(String table) throws SolrClientServiceException {
         ConfigSetAdminResponse.List listRequestReponse;
         SiddhiSolrClient siddhiSolrClient = getSolrServiceClient();
-        String tableNameWithTenantDomain = IndexerUtils.getCollectionNameWithDomainName(table);
+        String tableNameWithTenantDomain = SolrTableUtils.getCollectionNameWithDomainName(table);
         ConfigSetAdminRequest.List listRequest = new ConfigSetAdminRequest.List();
         try {
             listRequestReponse = listRequest.process(siddhiSolrClient);
@@ -377,7 +377,7 @@ public class SolrClientServiceImpl implements SolrClientService {
     public void insertDocuments(String table, List<SolrIndexDocument> docs) throws SolrClientServiceException {
         try {
             SiddhiSolrClient client = getSolrServiceClient();
-            client.add(table, IndexerUtils.getSolrInputDocuments(docs));
+            client.add(table, SolrTableUtils.getSolrInputDocuments(docs));
             //TODO:should find a better way to commit, there are different overloaded methods of commit
             client.commit(table);
         } catch (SolrServerException | IOException e) {

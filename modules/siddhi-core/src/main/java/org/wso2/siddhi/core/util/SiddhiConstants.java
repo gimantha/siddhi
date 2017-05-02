@@ -60,12 +60,6 @@ public final class SiddhiConstants {
     public static final String ANNOTATION_IDLE_TIME = "IdleTime";
     public static final String ANNOTATION_INCREMENT = "Increment";
     public static final String ANNOTATION_ELEMENT_TYPE = "type";
-    public static final String ANNOTATION_ELEMENT_COLLECTION = "collection";
-    public static final String ANNOTATION_ELEMENT_URL = "url";
-    public static final String ANNOTATION_ELEMENT_SHARDS = "shards";
-    public static final String ANNOTATION_ELEMENT_REPLICA = "replicas";
-    public static final String ANNOTATION_ELEMENT_SCHEMA = "schema";
-    public static final String ANNOTATION_ELEMENT_CONFIGSET = "configset";
     public static final String ANNOTATION_STORE = "store";
 
     public static final String TRUE = "true";

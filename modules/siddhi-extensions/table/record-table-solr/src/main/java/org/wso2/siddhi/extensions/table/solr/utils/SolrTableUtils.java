@@ -1,14 +1,14 @@
-package org.wso2.siddhi.extensions.recordtable.solr.utils;
+package org.wso2.siddhi.extensions.table.solr.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrIndexDocumentField;
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrIndexDocument;
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchema;
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchemaField;
-import org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrClientServiceException;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrIndexDocumentField;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrIndexDocument;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrSchema;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrSchemaField;
+import org.wso2.siddhi.extensions.table.solr.exceptions.SolrClientServiceException;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -23,9 +23,9 @@ import java.util.Map;
 /**
  * This class contains the utility methods required by the indexer service.
  */
-public class IndexerUtils {
+public class SolrTableUtils {
 
-    private static Log log = LogFactory.getLog(IndexerUtils.class);
+    private static Log log = LogFactory.getLog(SolrTableUtils.class);
 
     public static final String CUSTOM_WSO2_CONF_DIR_NAME = "conf";
     public static final String WSO2_ANALYTICS_INDEX_CONF_DIRECTORY_SYS_PROP = "wso2_custom_index_conf_dir";

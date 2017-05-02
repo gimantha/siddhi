@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.siddhi.extensions.recordtable.solr;
+package org.wso2.siddhi.extensions.table.solr;
 
 import org.wso2.siddhi.core.exception.ExecutionPlanCreationException;
 import org.wso2.siddhi.core.table.record.AbstractRecordTable;
@@ -24,11 +24,12 @@ import org.wso2.siddhi.core.table.record.ConditionBuilder;
 import org.wso2.siddhi.core.table.record.RecordIterator;
 import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.core.util.collection.operator.CompiledCondition;
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchema;
-import org.wso2.siddhi.extensions.recordtable.solr.config.CollectionConfiguration;
-import org.wso2.siddhi.extensions.recordtable.solr.exceptions.SolrClientServiceException;
-import org.wso2.siddhi.extensions.recordtable.solr.impl.SolrClientServiceImpl;
-import org.wso2.siddhi.extensions.recordtable.solr.utils.IndexerUtils;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrSchema;
+import org.wso2.siddhi.extensions.table.solr.config.CollectionConfiguration;
+import org.wso2.siddhi.extensions.table.solr.exceptions.SolrClientServiceException;
+import org.wso2.siddhi.extensions.table.solr.impl.SolrClientServiceImpl;
+import org.wso2.siddhi.extensions.table.solr.utils.SolrTableConstants;
+import org.wso2.siddhi.extensions.table.solr.utils.SolrTableUtils;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.TableDefinition;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
@@ -58,12 +59,12 @@ public class SolrEventTable extends AbstractRecordTable {
         }
 
         if (storeAnnotation != null) {
-            String collectionName = storeAnnotation.getElement(SiddhiConstants.ANNOTATION_ELEMENT_COLLECTION);
-            String url = storeAnnotation.getElement(SiddhiConstants.ANNOTATION_ELEMENT_URL);
-            int shards = Integer.parseInt(storeAnnotation.getElement(SiddhiConstants.ANNOTATION_ELEMENT_SHARDS));
-            int replicas = Integer.parseInt(storeAnnotation.getElement(SiddhiConstants.ANNOTATION_ELEMENT_REPLICA));
-            String schema = storeAnnotation.getElement(SiddhiConstants.ANNOTATION_ELEMENT_SCHEMA);
-            String configSet = storeAnnotation.getElement(SiddhiConstants.ANNOTATION_ELEMENT_CONFIGSET);
+            String collectionName = storeAnnotation.getElement(SolrTableConstants.ANNOTATION_ELEMENT_COLLECTION);
+            String url = storeAnnotation.getElement(SolrTableConstants.ANNOTATION_ELEMENT_URL);
+            int shards = Integer.parseInt(storeAnnotation.getElement(SolrTableConstants.ANNOTATION_ELEMENT_SHARDS));
+            int replicas = Integer.parseInt(storeAnnotation.getElement(SolrTableConstants.ANNOTATION_ELEMENT_REPLICA));
+            String schema = storeAnnotation.getElement(SolrTableConstants.ANNOTATION_ELEMENT_SCHEMA);
+            String configSet = storeAnnotation.getElement(SolrTableConstants.ANNOTATION_ELEMENT_CONFIGSET);
 
             if (collectionName == null || collectionName.trim().isEmpty()) {
                 throw new ExecutionPlanCreationException("Solr collection name cannot be null or empty");
@@ -76,7 +77,7 @@ public class SolrEventTable extends AbstractRecordTable {
                                                          "than" +
                                                          " 1");
             }
-            SolrSchema solrSchema = IndexerUtils.createIndexSchema(primaryKey, schema);
+            SolrSchema solrSchema = SolrTableUtils.createIndexSchema(primaryKey, schema);
             CollectionConfiguration collectionConfig = new CollectionConfiguration.Builder().collectionName
                     (collectionName).solrServerUrl(url).shards(shards).replicas(replicas).configs(configSet).schema
                     (solrSchema).build();

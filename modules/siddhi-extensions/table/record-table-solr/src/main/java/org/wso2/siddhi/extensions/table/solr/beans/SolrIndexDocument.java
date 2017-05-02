@@ -1,7 +1,7 @@
-package org.wso2.siddhi.extensions.recordtable.solr.beans;
+package org.wso2.siddhi.extensions.table.solr.beans;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.wso2.siddhi.extensions.recordtable.solr.utils.IndexerUtils;
+import org.wso2.siddhi.extensions.table.solr.utils.SolrTableUtils;
 
 import java.util.Map;
 
@@ -15,6 +15,6 @@ public class SolrIndexDocument extends SolrInputDocument {
     }
 
     public SolrIndexDocument(Map<String, SolrIndexDocumentField> fields) {
-        super(IndexerUtils.getSolrFields(fields));
+        super(SolrTableUtils.getSolrFields(fields));
     }
 }

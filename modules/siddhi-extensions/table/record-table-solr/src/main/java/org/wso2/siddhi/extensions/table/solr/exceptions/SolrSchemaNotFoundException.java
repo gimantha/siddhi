@@ -1,4 +1,4 @@
-package org.wso2.siddhi.extensions.recordtable.solr.exceptions;
+package org.wso2.siddhi.extensions.table.solr.exceptions;
 
 /**
  * This exception is thrown when a given index schema is not found

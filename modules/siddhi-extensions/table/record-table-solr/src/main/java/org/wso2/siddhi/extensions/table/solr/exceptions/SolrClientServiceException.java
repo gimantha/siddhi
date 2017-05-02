@@ -1,4 +1,4 @@
-package org.wso2.siddhi.extensions.recordtable.solr.exceptions;
+package org.wso2.siddhi.extensions.table.solr.exceptions;
 
 /**
  * This exception represents the Exception which might be thrown if there are any issues in the indexers

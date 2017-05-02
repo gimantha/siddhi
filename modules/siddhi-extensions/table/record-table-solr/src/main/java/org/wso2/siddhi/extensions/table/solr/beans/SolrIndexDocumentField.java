@@ -1,4 +1,4 @@
-package org.wso2.siddhi.extensions.recordtable.solr.beans;
+package org.wso2.siddhi.extensions.table.solr.beans;
 
 import org.apache.solr.common.SolrInputField;
 

@@ -16,4 +16,4 @@
 # under the License.
 #
 
-org.wso2.siddhi.extensions.recordtable.solr.impl.SolrClientServiceImpl
+org.wso2.siddhi.extensions.table.solr.impl.SolrClientServiceImpl

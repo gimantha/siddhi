@@ -1,6 +1,6 @@
-package org.wso2.siddhi.extensions.recordtable.solr.config;
+package org.wso2.siddhi.extensions.table.solr.config;
 
-import org.wso2.siddhi.extensions.recordtable.solr.beans.SolrSchema;
+import org.wso2.siddhi.extensions.table.solr.beans.SolrSchema;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -1,4 +1,4 @@
-package org.wso2.siddhi.extensions.recordtable.solr.beans;
+package org.wso2.siddhi.extensions.table.solr.beans;
 
 import java.io.Serializable;
 import java.util.HashMap;
